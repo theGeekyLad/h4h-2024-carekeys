@@ -36,10 +36,14 @@
             />
     </Preference>
     <Preference
-        android:title="@string/license">
-        <intent
-            android:action="android.intent.action.VIEW"
-            android:data="https://github.com/rkkr/simple-keyboard/blob/master/LICENSE"
-            />
-    </Preference>
+        android:title="Switch Input"
+        android:key="screen_switch_input" />
+    <Preference
+        android:title="@string/device_admin"
+        android:summary="Enable device administration"
+        android:key="screen_enable_admin" />
+    <Preference
+        android:title="Sign out"
+        android:summary="Logged in as Rahul"
+        android:key="screen_login" />
 </PreferenceScreen>

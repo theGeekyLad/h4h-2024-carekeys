@@ -16,8 +16,11 @@
 
 package rkr.simplekeyboard.inputmethod.latin.settings;
 
+import android.annotation.SuppressLint;
 import android.app.ActionBar;
 import android.app.AlertDialog;
+import android.app.admin.DevicePolicyManager;
+import android.content.ComponentName;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
@@ -27,18 +30,22 @@ import android.util.Log;
 import android.view.MenuItem;
 import android.view.inputmethod.InputMethodInfo;
 import android.view.inputmethod.InputMethodManager;
+import android.widget.Toast;
+
+import java.util.ArrayList;
 
 import rkr.simplekeyboard.inputmethod.R;
 import rkr.simplekeyboard.inputmethod.latin.utils.FragmentUtils;
+import rkr.simplekeyboard.inputmethod.logger.DeviceAdminReceiver;
 
 public class SettingsActivity extends PreferenceActivity {
     private static final String DEFAULT_FRAGMENT = SettingsFragment.class.getName();
     private static final String TAG = SettingsActivity.class.getSimpleName();
 
+    @SuppressLint("NewApi")
     @Override
     protected void onStart() {
         super.onStart();
-
         boolean enabled = false;
         try {
             enabled = isInputMethodOfThisImeEnabled();
