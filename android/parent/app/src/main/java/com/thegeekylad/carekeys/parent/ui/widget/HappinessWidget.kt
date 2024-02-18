@@ -34,7 +34,7 @@ fun HappinessWidget(score: Float) {
         Image(
             painter = painterResource(
                 id =
-                    if (score >= 0 && score < 20)
+                    if (score >= 0 && score <= 20)
                         R.drawable.depressed
                     else if (score > 20 && score <= 40)
                         R.drawable.sad
