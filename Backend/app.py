@@ -17,16 +17,30 @@ def test_api_connection():
     return jsonify({ 'data': request.json,'message': 'tetsing in progress!'}), 200
 
 @app.route("/text", methods=['POST'])
-def send_text(): 
+def send_text_fn():
+    data = request.get_json()
+    print(data)
     if send_text(request.json):
         print("Recieveing message")
         return jsonify({'message': 'Message !'}), 200
     else:
         return jsonify({'message': 'message retrival failed!'}), 400
+    
+@app.route("/barGraph", methods=['POST'])
+def retrieve_bar_graph_info_fn():
+    data = retrieve_bar_graph_info()
+    result_json = { 'data': data}
+    return jsonify(result_json),200
+
+@app.route("/emotion", methods=['POST'])
+def list_files():
+    data = retrieve_summary()
+    result_json = { 'data': data}
+    return jsonify(result_json),200
 
 @app.route("/")
 def test():
-    return "<h1>Test one-d connection successful</h1>"
+    return "<h1>Test care-keys backend connection successful</h1>"
 
 
 if __name__ == "__main__":
