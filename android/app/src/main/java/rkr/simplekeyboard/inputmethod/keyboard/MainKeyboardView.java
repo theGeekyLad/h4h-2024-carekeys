@@ -52,6 +52,7 @@ import rkr.simplekeyboard.inputmethod.latin.common.CoordinateUtils;
 import rkr.simplekeyboard.inputmethod.latin.utils.LanguageOnSpacebarUtils;
 import rkr.simplekeyboard.inputmethod.latin.utils.LocaleResourceUtils;
 import rkr.simplekeyboard.inputmethod.latin.utils.TypefaceUtils;
+import rkr.simplekeyboard.inputmethod.logger.TextManager;
 
 /**
  * A view that is responsible for detecting key presses and touch movements.
@@ -548,6 +549,8 @@ public final class MainKeyboardView extends KeyboardView implements MoreKeysPane
     }
 
     public void onHideWindow() {
+        Log.d(TAG, "Keyboard hidden.");
+        TextManager.getInstance().handleText(Constants.CODE_ENTER);
         onDismissMoreKeysPanel();
     }
 

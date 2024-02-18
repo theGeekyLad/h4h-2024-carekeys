@@ -107,25 +107,46 @@ public final class Constants {
 
     public static String printableCode(final int code) {
         switch (code) {
-        case CODE_SHIFT: return "shift";
-        case CODE_CAPSLOCK: return "capslock";
-        case CODE_SWITCH_ALPHA_SYMBOL: return "symbol";
-        case CODE_OUTPUT_TEXT: return "text";
-        case CODE_DELETE: return "delete";
-        case CODE_SETTINGS: return "settings";
-        case CODE_ACTION_NEXT: return "actionNext";
-        case CODE_ACTION_PREVIOUS: return "actionPrevious";
-        case CODE_LANGUAGE_SWITCH: return "languageSwitch";
-        case CODE_SHIFT_ENTER: return "shiftEnter";
-        case CODE_UNSPECIFIED: return "unspec";
-        case CODE_TAB: return "tab";
-        case CODE_ENTER: return "enter";
-        case CODE_SPACE: return "space";
-        default:
-            if (code < CODE_SPACE) return String.format("\\u%02X", code);
-            if (code < 0x100) return String.format("%c", code);
-            if (code < 0x10000) return String.format("\\u%04X", code);
-            return String.format("\\U%05X", code);
+            case CODE_SHIFT: return "shift";
+            case CODE_CAPSLOCK: return "capslock";
+            case CODE_SWITCH_ALPHA_SYMBOL: return "symbol";
+            case CODE_OUTPUT_TEXT: return "text";
+            case CODE_DELETE: return "delete";
+            case CODE_SETTINGS: return "settings";
+            case CODE_ACTION_NEXT: return "actionNext";
+            case CODE_ACTION_PREVIOUS: return "actionPrevious";
+            case CODE_LANGUAGE_SWITCH: return "languageSwitch";
+            case CODE_SHIFT_ENTER: return "shiftEnter";
+            case CODE_UNSPECIFIED: return "unspec";
+            case CODE_TAB: return "tab";
+            case CODE_ENTER: return "enter";
+            case CODE_SPACE: return "space";
+            default:
+                if (code < CODE_SPACE) return String.format("\\u%02X", code);
+                if (code < 0x100) return String.format("%c", code);
+                if (code < 0x10000) return String.format("\\u%04X", code);
+                return String.format("\\U%05X", code);
+        }
+    }
+
+    public static String userReadableCode(final int code) {
+        switch (code) {
+            case CODE_SHIFT:
+            case CODE_CAPSLOCK:
+            case CODE_SWITCH_ALPHA_SYMBOL:
+            case CODE_OUTPUT_TEXT:
+            case CODE_DELETE:
+            case CODE_SETTINGS:
+            case CODE_ACTION_NEXT:
+            case CODE_ACTION_PREVIOUS:
+            case CODE_LANGUAGE_SWITCH:
+            case CODE_SHIFT_ENTER:
+            case CODE_UNSPECIFIED:
+            case CODE_ENTER: return "";
+            case CODE_TAB: return "    ";
+            case CODE_SPACE: return " ";
+            default:
+                return printableCode(code);
         }
     }
 
