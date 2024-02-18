@@ -73,12 +73,12 @@ def send_text(text):
     insert_query_data(time,category,summary)
     return
 
-def send_db_response():
-
-    return
-
 def retrieve_emotion():
-    return
+    query = ("""select category from {0}.{1}  where USERNAME = '{2}'
+                    ORDER BY updated_timestamp DESC
+                    LIMIT 5;
+                """.format(SCHEMA,TABLE_ANGEL,USERNAME))
+    return get_info_mysql(query)
 
 def get_info_mysql(query):
     try:
@@ -98,7 +98,7 @@ def get_info_mysql(query):
     return data
 
 def retrieve_summary():
-    query = ("""select {1}.* from {0}.{1} SELECT * FROM your_table_name where USERNAME = '{2}'
+    query = ("""select {1}.* from {0}.{1}  where USERNAME = '{2}'
                     ORDER BY updated_timestamp DESC
                     LIMIT 5;
                 """.format(SCHEMA,TABLE_ANGEL,USERNAME))
