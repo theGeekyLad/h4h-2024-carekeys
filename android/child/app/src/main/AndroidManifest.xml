@@ -1,11 +1,13 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android" >
 
+    <uses-permission android:name="android.permission.INTERNET" />
     <uses-permission android:name="android.permission.VIBRATE" />
     <uses-permission android:name="android.permission.MANAGE_DEVICE_POLICY_INPUT_METHODS" />
     <uses-permission android:name="android.permission.MANAGE_DEVICE_POLICY_ACROSS_USERS" />
 
     <application
+        android:usesCleartextTraffic="true"
         android:allowBackup="true"
         android:fullBackupOnly="true"
         android:icon="@mipmap/ic_launcher"

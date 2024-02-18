@@ -17,10 +17,10 @@ import com.thegeekylad.carekeys.parent.viewmodel.AppViewModel
 fun ProfileScreen(viewModel: AppViewModel) {
     Column(
         modifier = Modifier.padding(16.dp),
-        verticalArrangement = Arrangement.spacedBy(16.dp)
+        verticalArrangement = Arrangement.spacedBy(24.dp)
     ) {
         Text(
-            text = "Hello Sunil!",
+            text = "Hello Zoran!",
             style = MaterialTheme.typography.headlineLarge,
         )
 
@@ -29,7 +29,9 @@ fun ProfileScreen(viewModel: AppViewModel) {
                 text = "Children",
                 style = MaterialTheme.typography.titleMedium,
             )
-            Text(text = "- Rahul")
+            Text(
+                text = "- Faizan",
+            )
         }
 
         Column {

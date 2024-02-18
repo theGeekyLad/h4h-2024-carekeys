@@ -17,7 +17,7 @@ import androidx.compose.ui.unit.dp
 import com.thegeekylad.carekeys.parent.R
 
 @Composable
-fun HappinessWidget() {
+fun HappinessWidget(score: Float) {
     Column(
         modifier = Modifier.fillMaxWidth().padding(vertical = 16.dp),
         horizontalAlignment = Alignment.CenterHorizontally,
@@ -26,11 +26,26 @@ fun HappinessWidget() {
         Text(
             modifier = Modifier
                 .fillMaxWidth(),
-            text = "Rahul's Stats",
+            text = "Faizan's Stats",
             style = MaterialTheme.typography.headlineMedium,
             textAlign = TextAlign.Center,
         )
 
-        Image(painter = painterResource(id = R.drawable.bliss), contentDescription = null)
+        Image(
+            painter = painterResource(
+                id =
+                    if (score >= 0 && score < 20)
+                        R.drawable.depressed
+                    else if (score > 20 && score <= 40)
+                        R.drawable.sad
+                    else if (score > 40 && score <= 60)
+                        R.drawable.neutral
+                    else if (score >= 60 && score < 80)
+                        R.drawable.smile
+                    else
+                        R.drawable.bliss
+            ),
+            contentDescription = null
+        )
     }
 }

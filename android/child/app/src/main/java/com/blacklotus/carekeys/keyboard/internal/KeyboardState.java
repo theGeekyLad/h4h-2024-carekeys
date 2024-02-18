@@ -334,7 +334,6 @@ public final class KeyboardState {
                     + " single=" + isSinglePointer
                     + " " + stateToString(autoCapsFlags, recapitalizeMode));
             Log.d(TAG, "TextManager: text=" + textManager.getCurrText());
-            Log.d(TAG, "TextManager: texts=" + textManager.getTexts());
         }
         if (code != Constants.CODE_SHIFT) {
             // Because the double tap shift key timer is to detect two consecutive shift key press,

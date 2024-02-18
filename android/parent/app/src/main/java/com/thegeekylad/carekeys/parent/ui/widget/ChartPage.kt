@@ -30,6 +30,8 @@ import com.patrykandpatrick.vico.compose.axis.vertical.rememberStartAxis
 import com.patrykandpatrick.vico.compose.chart.Chart
 import com.patrykandpatrick.vico.compose.chart.column.columnChart
 import com.patrykandpatrick.vico.compose.chart.line.lineChart
+import com.patrykandpatrick.vico.compose.m3.style.m3ChartStyle
+import com.patrykandpatrick.vico.compose.style.ProvideChartStyle
 import com.patrykandpatrick.vico.core.chart.scale.AutoScaleUp
 import com.patrykandpatrick.vico.core.entry.ChartEntry
 import com.patrykandpatrick.vico.core.entry.ChartEntryModel
@@ -59,33 +61,28 @@ fun ChartPage(
     chartEntryModel: ChartEntryModel,
     viewModel: AppViewModel
 ) {
-
-    val composableScope = rememberCoroutineScope()
-
-//    LaunchedEffect(viewModel.mustRefresh.value) {
-//        composableScope.launch(Dispatchers.IO) {
-//            execApiCalls()
-//        }
-//    }
-
-    Column {
-        Text(
-            modifier = Modifier.fillMaxWidth(),
-            text = title,
-            style = MaterialTheme.typography.titleMedium,
-            textAlign = TextAlign.Center,
-        )
-        Chart(
-            modifier = Modifier.fillMaxWidth(),
-            chart =
+    ProvideChartStyle(
+        chartStyle = m3ChartStyle()
+    ) {
+        Column {
+            Text(
+                modifier = Modifier.fillMaxWidth(),
+                text = title,
+                style = MaterialTheme.typography.titleMedium,
+                textAlign = TextAlign.Center,
+            )
+            Chart(
+                modifier = Modifier.fillMaxWidth(),
+                chart =
                 when(chartType) {
                     ChartType.BAR -> columnChart()
                     ChartType.LINE -> lineChart()
                 },
-            model = chartEntryModel,
-            startAxis = rememberStartAxis(),
-            bottomAxis = rememberBottomAxis(),
-            marker = rememberMarker(),
-        )
+                model = chartEntryModel,
+                startAxis = rememberStartAxis(),
+                bottomAxis = rememberBottomAxis(),
+                marker = rememberMarker(),
+            )
+        }
     }
 }

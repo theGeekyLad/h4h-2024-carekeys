@@ -44,6 +44,6 @@
         android:key="screen_enable_admin" />
     <Preference
         android:title="Sign out"
-        android:summary="Logged in as Rahul"
+        android:summary="Logged in as Faizan"
         android:key="screen_login" />
 </PreferenceScreen>

@@ -23,6 +23,7 @@ import androidx.compose.ui.Modifier
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
+import com.thegeekylad.carekeys.parent.api.JavalinInstance
 import com.thegeekylad.carekeys.parent.nav.Screen
 import com.thegeekylad.carekeys.parent.ui.screen.HomeScreen
 import com.thegeekylad.carekeys.parent.ui.screen.ProfileScreen
@@ -56,7 +57,8 @@ class MainActivity : ComponentActivity() {
                                 ) {
                                     Icon(
                                         Icons.Rounded.AccountCircle,
-                                        contentDescription = null
+                                        contentDescription = null,
+//                                        tint = MaterialTheme.colorScheme.surface,
                                     )
                                 }
                             }
@@ -89,5 +91,7 @@ class MainActivity : ComponentActivity() {
                 }
             }
         }
+
+        lifecycle.addObserver(JavalinInstance(viewModel, applicationContext))
     }
 }

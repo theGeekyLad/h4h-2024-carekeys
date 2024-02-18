@@ -1,21 +1,18 @@
 package com.thegeekylad.carekeys.parent.ui.screen
 
 import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.material3.Divider
 import androidx.compose.material3.ExperimentalMaterial3Api
-import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
 import com.patrykandpatrick.vico.core.entry.entriesOf
 import com.patrykandpatrick.vico.core.entry.entryModelOf
@@ -23,19 +20,20 @@ import com.thegeekylad.carekeys.parent.ui.widget.ChartPage
 import com.thegeekylad.carekeys.parent.ui.widget.ChartType
 import com.thegeekylad.carekeys.parent.ui.widget.HappinessWidget
 import com.thegeekylad.carekeys.parent.viewmodel.AppViewModel
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
 
 @ExperimentalMaterial3Api
 @Composable
 fun HomeScreen(viewModel: AppViewModel) {
-    val dailyCategoryChartEntryModel by remember {
-        mutableStateOf(
-            entryModelOf(
-                entriesOf(5, 1),
-                entriesOf(1, 1),
-                entriesOf(4, 1),
-                entriesOf(0, 3),
-            )
-        )
+
+    val applicationContext = LocalContext.current.applicationContext
+    val coroutineScope = rememberCoroutineScope()
+
+    LaunchedEffect(viewModel.serviceWrapper) {
+        coroutineScope.launch(Dispatchers.IO) {
+            viewModel.barGraph(applicationContext)
+        }
     }
 
     val mentalHealthQuotientChartEntryModel by remember {
@@ -51,7 +49,7 @@ fun HomeScreen(viewModel: AppViewModel) {
         verticalArrangement = Arrangement.spacedBy(16.dp)
     ) {
         item {
-            HappinessWidget()
+            HappinessWidget(score = viewModel.latestEQAverage.value ?: 100f)
         }
 
         item {
@@ -63,7 +61,7 @@ fun HomeScreen(viewModel: AppViewModel) {
                 title = "Daily Category Rundown",
                 viewModel = viewModel,
                 chartType = ChartType.BAR,
-                chartEntryModel = dailyCategoryChartEntryModel
+                chartEntryModel = viewModel.dailyCategoryChartEntryModel.value ?: entryModelOf(emptyList())
             )
         }
 
@@ -72,7 +70,7 @@ fun HomeScreen(viewModel: AppViewModel) {
                 title = "Mental Health Quotient",
                 viewModel = viewModel,
                 chartType = ChartType.LINE,
-                chartEntryModel = mentalHealthQuotientChartEntryModel
+                chartEntryModel = viewModel.eqChartEntryModel.value ?: entryModelOf(emptyList())
             )
         }
     }

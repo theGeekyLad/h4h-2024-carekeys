@@ -97,4 +97,10 @@ dependencies {
     implementation("com.patrykandpatrick.vico:compose-m3:1.12.0")
     implementation("com.patrykandpatrick.vico:core:1.12.0")
     implementation("com.patrykandpatrick.vico:views:1.12.0")
+
+    // javalin
+    implementation("io.javalin:javalin:4.0.0")
+
+    // slf4j
+    implementation("org.slf4j:slf4j-simple:2.0.11")
 }
