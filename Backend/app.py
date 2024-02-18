@@ -1,4 +1,4 @@
-#Developer : Anandu Sreekumar
+#Developer : Anandu Sreekumar, Faizan
 #
 #
 from util.function import *
@@ -18,7 +18,7 @@ def test_api_connection():
 
 @app.route("/text", methods=['POST'])
 def send_text(): 
-    if send_text_llm(request.json):
+    if send_text(request.json):
         print("Recieveing message")
         return jsonify({'message': 'Message !'}), 200
     else:
