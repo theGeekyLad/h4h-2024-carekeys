@@ -5,6 +5,9 @@ from werkzeug.utils import secure_filename
 from boto3 import *
 from os import environ
 import json
+from Crypto.Cipher import AES
+import base64
+
 
 USERNAME = 'Rahul'
 ENCRYPT_KEY = ''
@@ -32,16 +35,19 @@ def decrypt_message(encrypted_array,key):
 
 def send_llm(key_logger):
     #faizan
-    return summary
+    time = ''
+    category = ''
+    summary = ''
+    return time,category,summary
 
 def insert_query_data(time,category,summary):
     #functions to create insert query
-    query = ("INSERT INTO {0}.{1} (id, category, summary, message_recieieved_timestamp , updated_timestamp) \
-            VALUES ('{2}','{3}','{4}',NOW());"
-             .format(SCHEMA,TABLE_ANGEL,category,summary,time))
-    return set_upsert_rds(query)
+    query = ("INSERT INTO {0}.{1} (id, user_name,category, summary, message_recieieved_timestamp , updated_timestamp) \
+            VALUES ('{2}','{3}','{4}','{5}',NOW());"
+             .format(SCHEMA,TABLE_ANGEL,USERNAME, category,summary,time))
+    return set_upsert_mysql(query)
 
-def set_upsert_rds(query):
+def set_upsert_mysql(query):
     #function to insert and update to RDS
     try:
         print('Initiating set_upsert_rds function')
@@ -74,5 +80,26 @@ def send_db_response():
 def retrieve_emotion():
     return
 
+def get_info_mysql(query):
+    try:
+        db = connect_mysql()
+        print('Initiating get_info_rds function')
+        data = {}
+        cursor = db.cursor()
+        cursor.execute(query)
+        data = cursor.fetchall()
+        print("data {}".format(str(data)))
+    except Exception as e:
+        message = "Error running query:{0} Generated error: {1}".format(query,str(e))
+    else:
+        db.close()
+        message = "Query: {0} ran successfully!".format(query)
+    print(message)
+    return data
+
 def retrieve_summary():
-    return
+    query = ("""select {1}.* from {0}.{1} SELECT * FROM your_table_name where USERNAME = '{2}'
+                    ORDER BY updated_timestamp DESC
+                    LIMIT 5;
+                """.format(SCHEMA,TABLE_ANGEL,USERNAME))
+    return get_info_mysql(query)
