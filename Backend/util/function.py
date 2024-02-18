@@ -2,14 +2,15 @@ import pymysql
 import random
 from pymysql import *
 from werkzeug.utils import secure_filename
+from Crypto.Cipher import AES
+from Crypto.Util.Padding import unpad
 from boto3 import *
 from os import environ
 import json
-from Crypto.Cipher import AES
 import base64
 import openai
-
-
+import requests
+from flask import jsonify
 
 
 def connect_mysql():
@@ -27,6 +28,7 @@ def decrypt_message(encrypted_array,key):
     for encrypted_str in encrypted_array:
         encrypted_data = base64.b64decode(encrypted_str)
         decrypted = cipher.decrypt(encrypted_data)
+        decrypted = unpad(decrypted, AES.block_size, style='pkcs7')
         decrypted_array.append(decrypted.rstrip(b"\0").decode('utf-8'))
     return decrypted_array
 
@@ -55,14 +57,32 @@ def insert_query_data(response,message_date):
          .format(SCHEMA, 
                  TABLE_ANGEL, 
                  USERNAME, 
-                 response['depression_intensity'].split('/')[0], 
-                 response['violence_intensity'].split('/')[0], 
-                 response['self_harm_intensity'].split('/')[0], 
-                 response['sexual_misconduct_intensity'].split('/')[0], 
+                 response.get('depression_intensity','0/5').split('/')[0], 
+                 response.get('violence_intensity','0/5').split('/')[0], 
+                 response.get('self_harm_intensity','0/5').split('/')[0], 
+                 response.get('sexual_misconduct_intensity','0/5').split('/')[0], 
                  response['summary'],
                  message_date))
     print(query)
-    return set_upsert_mysql(query)
+    if set_upsert_mysql(query):
+        print('Notifying parent mobile!')
+        max_intensity = 5
+        total_intensities = int(response.get('depression_intensity','0/5').split('/')[0]) + int(response.get('violence_intensity','0/5').split('/')[0]) + int(response.get('self_harm_intensity','0/5').split('/')[0]) + int(response.get('sexual_misconduct_intensity','0/5').split('/')[0])
+        average_intensity = total_intensities / 4
+        eq_value = (max_intensity - average_intensity) * 25  # Scale to range 0-100
+        data = {'data':[
+            [
+            message_date,
+            response.get('depression_intensity','0/5').split('/')[0],
+            response.get('violence_intensity','0/5').split('/')[0], 
+            response.get('self_harm_intensity','0/5').split('/')[0], 
+            response.get('sexual_misconduct_intensity','0/5').split('/')[0],
+            str(eq_value)
+            ]
+            ]
+        }
+        requests.post(NOTIFY_ANDROID, json=data)
+    return 
 
 def set_upsert_mysql(query):
     #function to insert and update to RDS
@@ -85,12 +105,12 @@ def set_upsert_mysql(query):
 def send_text(text_json):
     message_date = text_json.get('date')
     message_array = text_json.get('text')
-    print(str(message_array))
+    print("Encrypted data : "+str(message_array))
     decrypted_message_array = decrypt_message(message_array,ENCRYPT_KEY)
     #sending message to llm
-    print(str(decrypted_message_array))
+    print("Decrypted data : "+str(decrypted_message_array))
     response = send_llm('.'.join(message_array))
-    print(str(response))
+    print("Response from LLM : "+str(response))
     insert_query_data(response,message_date)
     return True
 
@@ -109,7 +129,8 @@ def retrieve_bar_graph_info():
                     AVG(depression_intensity) AS depression_intensity,
                     AVG(violence_intensity) AS violence_intensity,
                     AVG(self_harm_intensity) AS self_harm_intensity,
-                    AVG(sexual_misconduct_intensity) AS sexual_misconduct_intensity
+                    AVG(sexual_misconduct_intensity) AS sexual_misconduct_intensity,
+                    (5 - ((AVG(depression_intensity) + AVG(violence_intensity) + AVG(self_harm_intensity) + AVG(sexual_misconduct_intensity)) / 4)) * 25 AS eq_value
                 FROM 
                     {0}.{1}
                 WHERE 
