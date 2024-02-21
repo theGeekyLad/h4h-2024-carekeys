@@ -39,7 +39,7 @@ def send_llm(key_logger):
         response = openai.ChatCompletion.create(
             model=MODEL_ID,
             messages=[{"role": "system", 
-                       "content": "You are a support agent give the output in json format with key type and summary. Type can be one of the following: self_harm, violence, depression or sexual_misconduct_prevention. Identify the most prominent type and then generate a summary focused on the selected type based on the provided text inputs."},
+                       "content": "You are a support agent give the output in json format with keys depression_intensity, violence_intensity, self_harm_intensity, sexual_misconduct_intensity and summary. Give the intensity score between 0 to 5, given in the format value/5. Don't change the key name and identify the intensity for each key and then provide a summary."},
                       {"role": "user",
                         "content": key_logger}],
             temperature=0  # Adjust temperature if needed
@@ -66,23 +66,14 @@ def insert_query_data(response,message_date):
     print(query)
     if set_upsert_mysql(query):
         print('Notifying parent mobile!')
-        max_intensity = 5
-        total_intensities = int(response.get('depression_intensity','0/5').split('/')[0]) + int(response.get('violence_intensity','0/5').split('/')[0]) + int(response.get('self_harm_intensity','0/5').split('/')[0]) + int(response.get('sexual_misconduct_intensity','0/5').split('/')[0])
-        average_intensity = total_intensities / 4
-        eq_value = (max_intensity - average_intensity) * 25  # Scale to range 0-100
-        data = {'data':[
-            [
-            message_date,
-            response.get('depression_intensity','0/5').split('/')[0],
-            response.get('violence_intensity','0/5').split('/')[0], 
-            response.get('self_harm_intensity','0/5').split('/')[0], 
-            response.get('sexual_misconduct_intensity','0/5').split('/')[0],
-            str(eq_value)
-            ]
-            ]
-        }
-        requests.post(NOTIFY_ANDROID, json=data)
-    return 
+        data = retrieve_bar_graph_info()
+        print(str(data))
+        json_data = {'data':[
+                    [str(d[0])] + [str(val) for val in d[1:]]
+                    for d in data
+                ]}
+        requests.post(NOTIFY_ANDROID, json = json_data)
+    return True
 
 def set_upsert_mysql(query):
     #function to insert and update to RDS
@@ -126,19 +117,17 @@ def retrieve_bar_graph_info():
     query = """
                 SELECT 
                     DATE(message_timestamp) AS date,
-                    AVG(depression_intensity) AS depression_intensity,
-                    AVG(violence_intensity) AS violence_intensity,
-                    AVG(self_harm_intensity) AS self_harm_intensity,
-                    AVG(sexual_misconduct_intensity) AS sexual_misconduct_intensity,
-                    (5 - ((AVG(depression_intensity) + AVG(violence_intensity) + AVG(self_harm_intensity) + AVG(sexual_misconduct_intensity)) / 4)) * 25 AS eq_value
+                    CAST( AVG(depression_intensity) AS DECIMAL(10,2)) AS depression_intensity,
+                    CAST( AVG(violence_intensity) AS DECIMAL(10,2)) AS violence_intensity,
+                    CAST( AVG(self_harm_intensity) AS DECIMAL(10,2)) AS self_harm_intensity,
+                    CAST( AVG(sexual_misconduct_intensity) AS DECIMAL(10,2)) AS sexual_misconduct_intensity,
+                    (5 - ((CAST(AVG(depression_intensity) AS DECIMAL(10,2)) + CAST(AVG(violence_intensity) AS DECIMAL(10,2)) + CAST(AVG(self_harm_intensity) AS DECIMAL(10,2)) + CAST(AVG(sexual_misconduct_intensity) AS DECIMAL(10,2))) / 4.0)) * 0.25 AS eq_value
                 FROM 
                     {0}.{1}
-                WHERE 
-                    message_timestamp >= CURDATE() - INTERVAL 25 DAY and user = '{2}'
                 GROUP BY 
                     DATE(message_timestamp)
                 ORDER BY 
-                    date DESC;
+                    date DESC
             """.format(SCHEMA,TABLE_ANGEL,USERNAME)
     return  get_info_mysql(query)
 

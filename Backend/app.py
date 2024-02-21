@@ -29,8 +29,7 @@ def send_text_fn():
 @app.route("/barGraph", methods=['POST'])
 def retrieve_bar_graph_info_fn():
     data = retrieve_bar_graph_info()
-    result_json = { 'data': data}
-    return jsonify(result_json),200
+    return jsonify({ 'data': data}),200
 
 @app.route("/emotion", methods=['POST'])
 def list_files():
